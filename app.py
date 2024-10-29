@@ -135,7 +135,7 @@ def perform_prediction(model, days):
 
     # Prepare the data
     X = scaler.fit_transform(df[['Close', 'Return', 'Lag1', 'Lag2']].values[:-days])
-    y = df['Close'].values[2: -days+2]
+    y = df['Close'].values[2: -days + 2]
     X_forecast = scaler.transform(df[['Close', 'Return', 'Lag1', 'Lag2']].values[-days:])
 
     # Train-test split
