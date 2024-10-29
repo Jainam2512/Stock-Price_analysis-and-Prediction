@@ -42,7 +42,12 @@ start_date = today - datetime.timedelta(days=duration)
 start_date = st.sidebar.date_input('Start Date', value=start_date)
 end_date = st.sidebar.date_input('End Date', value=today)
 data = download_data(symbol, start_date, end_date)
-scaler = StandardScaler()
+
+# Ensure there's sufficient data to proceed
+if data.empty:
+    st.error("No data found for the selected stock. Please adjust the stock symbol or date range.")
+else:
+    scaler = StandardScaler()
 
 # Function to display technical indicators
 def tech_indicators():
@@ -96,7 +101,6 @@ def tech_indicators():
     # Interactive enhancements
     fig.update_layout(xaxis_rangeslider_visible=True, hovermode='x unified')
     st.plotly_chart(fig)
-
 
 # Function to display recent data
 def display_data():
@@ -167,7 +171,7 @@ def perform_prediction(model, days):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Actual Prices'))
     fig.add_trace(go.Scatter(x=future_dates, y=future_predictions, mode='lines+markers', name='Predicted Prices', line=dict(color='blue', dash='dash')))
-    fig.update_layout(title=f'{symbol} Stock Price Prediction', xaxis_title='Date', yaxis_title='Price (USD)', xaxis_rangeslider_visible=True)
+    fig.update_layout(title=f'{symbol} Stock Price Prediction', xaxis_title='Date', yaxis_title='Price (USD)')
     st.plotly_chart(fig)
 
 # Run the app
