@@ -49,6 +49,11 @@ def tech_indicators():
     st.header(f'Technical Indicators for {symbol}')
     indicator_option = st.radio('Select Indicator', ['Close Price', 'Bollinger Bands', 'MACD', 'RSI', 'ATR', 'OBV'])
 
+    # Ensure there are enough data points
+    if data['Close'].isnull().any() or len(data) < 14:
+        st.error("Insufficient data to calculate indicators. Please choose a different stock or adjust the date range.")
+        return
+
     # Calculate indicators
     bb = BollingerBands(data['Close'])
     macd = MACD(data['Close'])
@@ -76,7 +81,8 @@ def tech_indicators():
         fig.add_trace(go.Bar(x=data.index, y=macd.macd_diff(), name='MACD Histogram', marker_color='gray'))
         fig.update_layout(title='MACD Analysis', xaxis_title='Date', yaxis_title='MACD Value')
     elif indicator_option == 'RSI':
-        fig.add_trace(go.Scatter(x=data.index, y=rsi.rsi(), mode='lines', name='RSI'))
+        rsi_values = rsi.rsi()
+        fig.add_trace(go.Scatter(x=data.index, y=rsi_values, mode='lines', name='RSI'))
         fig.add_hline(y=70, line_dash='dash', line_color='red', annotation_text='Overbought', annotation_position='bottom right')
         fig.add_hline(y=30, line_dash='dash', line_color='green', annotation_text='Oversold', annotation_position='top right')
         fig.update_layout(title='RSI Analysis', xaxis_title='Date', yaxis_title='RSI Value')
@@ -90,6 +96,7 @@ def tech_indicators():
     # Interactive enhancements
     fig.update_layout(xaxis_rangeslider_visible=True, hovermode='x unified')
     st.plotly_chart(fig)
+
 
 # Function to display recent data
 def display_data():
