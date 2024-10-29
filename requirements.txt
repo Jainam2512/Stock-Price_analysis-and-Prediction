@@ -1,7 +1,7 @@
 streamlit
-scikit-learn
-yfinance
 pandas
+yfinance
 ta
-xgboost
 plotly
+scikit-learn
+xgboost
