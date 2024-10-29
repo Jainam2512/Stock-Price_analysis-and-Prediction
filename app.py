@@ -42,12 +42,7 @@ start_date = today - datetime.timedelta(days=duration)
 start_date = st.sidebar.date_input('Start Date', value=start_date)
 end_date = st.sidebar.date_input('End Date', value=today)
 data = download_data(symbol, start_date, end_date)
-
-# Ensure there's sufficient data to proceed
-if data.empty:
-    st.error("No data found for the selected stock. Please adjust the stock symbol or date range.")
-else:
-    scaler = StandardScaler()
+scaler = StandardScaler()
 
 # Function to display technical indicators
 def tech_indicators():
@@ -146,7 +141,7 @@ def perform_prediction(model, days):
 
     # Prepare the data
     X = scaler.fit_transform(df[['Close', 'Return', 'Lag1', 'Lag2']].values[:-days])
-    y = df['Close'].values[2: -days + 2]
+    y = df['Close'].values[2: -days+2]
     X_forecast = scaler.transform(df[['Close', 'Return', 'Lag1', 'Lag2']].values[-days:])
 
     # Train-test split
@@ -160,18 +155,20 @@ def perform_prediction(model, days):
 
     # Future predictions
     future_predictions = model.predict(X_forecast)
-    future_dates = pd.date_range(data.index[-1], periods=days + 1, closed='right')
+
+    # Generate future trading dates, excluding weekends and holidays
+    future_dates = pd.bdate_range(start=data.index[-1], periods=days + 1, closed='right')
 
     # Create a DataFrame for future predictions with dates
     future_df = pd.DataFrame({'Date': future_dates, 'Predicted Price': future_predictions})
-    st.subheader(f'{symbol} Predicted Prices for Next {days} Days')
+    st.subheader(f'{symbol} Predicted Prices for Next {days} Trading Days')
     st.dataframe(future_df)
 
     # Plotting the results
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Actual Prices'))
     fig.add_trace(go.Scatter(x=future_dates, y=future_predictions, mode='lines+markers', name='Predicted Prices', line=dict(color='blue', dash='dash')))
-    fig.update_layout(title=f'{symbol} Stock Price Prediction', xaxis_title='Date', yaxis_title='Price (USD)')
+    fig.update_layout(title=f'{symbol} Stock Price Prediction', xaxis_title='Date', yaxis_title='Price (USD)', xaxis_rangeslider_visible=True)
     st.plotly_chart(fig)
 
 # Run the app
