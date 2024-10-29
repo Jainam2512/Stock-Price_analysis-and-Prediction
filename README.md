@@ -12,7 +12,7 @@ Welcome to the Stock Price Prediction App! This app allows you to visualize stoc
 - ta (Technical Analysis Library)
 - scikit-learn
 - XGBoost
-_ Plotly
+- Plotly
   ## Author
 
 <h3 align="center">Hey Jainam Here</h3>
